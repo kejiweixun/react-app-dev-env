@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Form from './Form';
+import HelloWorld from './HelloWorld';
 
 class App extends Component {
  state = {
@@ -8,7 +8,7 @@ class App extends Component {
 
   render() {
     return (
-      <Form hello={this.state.hello}/>
+      <HelloWorld hello={this.state.hello}/>
     )
   }
 };

@@ -1,7 +1,7 @@
 import React from 'react';
-import './Form.scss'
+import './HelloWorld.scss'
 
-function Form(props){
+function HelloWorld(props){
   let hello = props.hello;
   return (
    <p>{hello}</p>
@@ -9,4 +9,4 @@ function Form(props){
 }; 
 
 
-export default Form;
+export default HelloWorld;
