@@ -3,14 +3,14 @@
 
 2019 年 7 月底开始学 React, 先看了一个 [Youtube 视频](https://www.youtube.com/watch?v=sBws8MSXN7A), 跟着做了一个 todo 应用, 不过这个视频没有教我们怎么搭建一个开发 React 应用的环境, 它用的是 [Create-React-App](https://github.com/facebook/create-react-app). 这种傻瓜式工具非常方便好用, 但是它到底是怎么工作的啊, 为什么浏览器可以识别 jsx, 为什么保存了网页就自动刷新, 这些问题让我这个第一次接触这种东东的人很好奇啊...
 
-虽然 React 官方文档介绍了使用 React 开发应用的[若干方法](https://reactjs.org/docs/add-react-to-a-website.html), 但和 Create-React-App 比起来差太多, 所以我就想不用 Create-React-App, 自己搭建一个简单点的开发环境. 后来发现搭建这个环境要用到很多 webpack 工具, 很多前端招聘都要求熟练掌握 webpack, 这个东东很利害吗, 我一直很好奇, 本来想学完 React 再学 webpack 的, 现在提前学了.
+虽然 React 官方文档介绍了使用 React 开发应用的[若干方法](https://reactjs.org/docs/add-react-to-a-website.html), 但和 Create-React-App 比起来差太多, 所以我就想不用 Create-React-App 自己搭建一个简单点的开发环境. 后来发现这个过程要用到 webpack 的很多功能, 很多前端招聘都要求熟练掌握 webpack, 这个东东很利害吗, 我一直很好奇, 本来想学完 React 再学 webpack 的, 现在提前学了.
 
 
 
 ## package.json 文件说明
 
 
-以下 6 个babel 依赖, 第一二个是核心, 通常都要安装, 第三个用于转换 react component 的 Property Initializers 写法, 第四五个是用来转换 react 和 es6+ 代码的规则, 第六个是 webpack 的 loader, 告诉 webpack 构建打包代码时用 babel 转换了再打包:
+以下 6 个 babel 依赖中, 第一二个是核心, 通常都要安装, 第三个用于转换 react component 的 Property Initializers 写法, 没有这个依赖很多 component 无法转换, 第四五个是用来转换 react 和 es6+ 代码的规则, 第六个是 webpack 的 loader, 告诉 webpack 构建打包代码时用 babel 转换了再打包:
 ```
     "@babel/cli": "^7.5.5",
     "@babel/core": "^7.5.5",
@@ -20,7 +20,7 @@
     "babel-loader": "^8.0.6",
 ```
 
-以下两个是 webpack 的插件, 它们的作用请看下面的 webpack.config.js 文件说明:
+以下两个是 webpack 的插件, webpack 本身的作用是打包 js 文件, 要实现其他功能需要借作各种 plugin 或 loader, 下面两个插件的作用请看 webpack.config.js 文件说明部分:
 ```
     "clean-webpack-plugin": "^3.0.0",
     "html-webpack-plugin": "^3.2.0",
@@ -43,7 +43,7 @@
     "webpack-dev-server": "^3.7.2",
 ```
 
-以下几个 eslint 依赖最主要是 eslint-config-react-app, 这是 Create-React-App 都在用的 sharable eslint config, 其他 eslint 大多是它的 peerDependencies. 顺便一提, 可以用 `npm info "eslint-config-react-app" peerDependencies` 查看一个依赖的 peerDependencies:
+以下几个 eslint 依赖中, 最主要是 eslint 和 eslint-config-react-app, 前者是 eslint 的主程序, 后者是 Create-React-App 都在用的 sharable eslint config, 其他 eslint 大多是它的 peerDependencies. 顺便一提, 可以用 `npm info "eslint-config-react-app" peerDependencies` 查看一个依赖的 peerDependencies:
 ```
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "@typescript-eslint/parser": "^1.13.0",
@@ -57,12 +57,12 @@
     "eslint-plugin-react-hooks": "^1.6.1",
 ```
 
-又一个 webpack loader, 告诉 webpack 用 .eslintrc 定义的方案进行代码检测:
+又一个 webpack loader, 告诉 webpack 使用在 .eslintrc 这个文件定义的方案进行代码检测:
 ```
     "eslint-loader": "^2.2.1",
 ```
 
-以下是 css 的提取, 打包, 以及 minify 工具:
+以下是 css 的提取, 打包, 以及 minify 工具. webpack 打包的时候默认把 css 打包到 js 文件, 这样在页面打开的一瞬间可能会看到页面的原始面目, 所以把 css 单独打包成一个文件可能更好, 这就是mini-css-extract-plugin 的作用, 顾名思义, 用于 extract css, optimize-css-assets-webpack-plugin 的作用是压缩 css 文件, 例如删除空行之类的:
 ```
     "mini-css-extract-plugin": "^0.8.0",
     "node-sass": "^4.12.0",
@@ -84,15 +84,18 @@
 
 
 ```
-//自动把带 hash 的文件插入 html 模板文件中, 还能 minify html 文件
+//自动把带 hash 的文件插入 html 模板文件中, 还能 minify html 文件, 例如删除标签属性的引号, 我今天才知道属性的引号是可以删除的...
 const HtmlWebpackPlugin = require('html-webpack-plugin'); 
+
 //单独打包 css, 而不是打包在 js 文件中
 const MiniCssExtractPlugin = require('mini-css-extract-plugin'); 
+
 //用了 bash 文件名后, build 的时候自动清理旧的打包文件
 const { CleanWebpackPlugin } = require('clean-webpack-plugin'); 
-const OptimizeCssAssetsWebpackPlugin = require
+
 //用来 minify css
-('optimize-css-assets-webpack-plugin'); 
+const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin'); 
+
 //用了上面的 css minify 工具后, webpack 默认无法 minify js 文件, 需要再引入这个插件
 const TerserWebpackPlugin = require('terser-webpack-plugin'); 
 
@@ -163,7 +166,7 @@ module.exports = {
 ## .babelrc 文件说明
 
 
-presets 定义了 babel 转换 js 代码的规则, 其中 `@babel/preset-react` 是转换 react 代码的规则, `@babel/preset-env` 是把新版 js 代码v转换成大多数浏览器都兼容的 js 代码的规则:
+presets 定义了 babel 转换 js 代码的规则, 其中 @babel/preset-react 是转换 react 代码的规则, @babel/preset-env 是把新版 js 代码v转换成大多数浏览器都兼容的 js 代码的规则:
 ```
 {
   "presets": ["@babel/preset-react", "@babel/preset-env"],
@@ -176,7 +179,7 @@ presets 定义了 babel 转换 js 代码的规则, 其中 `@babel/preset-react` 
 ## .eslintrc.json 文件说明
 
 
-用 `npm install` 之后, 可以通过 `npx eslint --init` 创建这个 .eslintrc.json 文件, 不过我们希望用第三方的代码检测规则, 所以要把 `"extends":` 的值改成这个第三方的规则. 我这里用的是第三方规则叫 `eslint-config-react-app`, 所以改成 `"extends": "react-app",`.
+用 `npm install` 之后, 可以通过 `npx eslint --init` 创建这个 .eslintrc.json 文件, 不过我们希望用第三方的代码检测规则, 所以要把 `"extends":` 的值改成这个第三方的规则. 我这里用的第三方规则叫 eslint-config-react-app, 所以改成 `"extends": "react-app",`.
 ```
 {
     "env": {
