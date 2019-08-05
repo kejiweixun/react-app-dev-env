@@ -1,14 +1,28 @@
 import React, { Component } from 'react';
-import HelloWorld from './HelloWorld';
 
 class App extends Component {
- state = {
-   hello: 'hello world!'
- }
+  state = {
+    hello: 'hello world!',
+    Element: '',
+  }
+
+  componentDidMount = () => {
+    import(/* webpackChunkName: "HelloWorld" */ './HelloWorld')
+      .then(res => res.default)
+      .then(HelloWorld => {
+        this.setState({
+          Element: HelloWorld
+        });
+      })
+  }
 
   render() {
+    let Element = this.state.Element;
+    console.log(Element);
     return (
-      <HelloWorld hello={this.state.hello}/>
+      <div>
+       {Element && <Element hello={this.state.hello}/>}
+      </div>
     )
   }
 };

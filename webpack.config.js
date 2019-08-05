@@ -6,7 +6,8 @@ const TerserWebpackPlugin = require('terser-webpack-plugin');
 
 module.exports = {
   output: {
-    filename: '[name]-[contentHash].js'
+    filename: '[name]-[contentHash].js',
+    chunkFilename: '[name]-[contentHash].js'
   },
   module: {
     rules: [
@@ -50,7 +51,7 @@ module.exports = {
   }),
     new MiniCssExtractPlugin({
       filename: '[name]-[contentHash].css',
-      chunkFilename: '[id].css',
+      chunkFilename: '[name]-[contentHash].css',
       ignoreOrder: false, 
     }),
     new CleanWebpackPlugin(),

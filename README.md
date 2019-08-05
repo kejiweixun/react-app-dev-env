@@ -10,11 +10,12 @@
 ## package.json 文件说明
 
 
-以下 6 个 babel 依赖中, 第一二个是核心, 通常都要安装, 第三个用于转换 react component 的 Property Initializers 写法, 没有这个依赖很多 component 无法转换, 第四五个是用来转换 react 和 es6+ 代码的规则, 第六个是 webpack 的 loader, 告诉 webpack 构建打包代码时用 babel 转换了再打包:
+以下 6 个 babel 依赖中, 第一二个是核心, 通常都要安装, 第三个用于转换 react component 的 Property Initializers 写法, 没有这个依赖很多 component 无法转换, 第四个处理 dynamic import 的写法, 第五六个是用来转换 react 和 es6+ 代码的规则, 第七个是 webpack 的 loader, 告诉 webpack 构建打包代码时用 babel 转换了再打包:
 ```
     "@babel/cli": "^7.5.5",
     "@babel/core": "^7.5.5",
     "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/preset-env": "^7.5.5",
     "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.0.6",
@@ -103,6 +104,8 @@ module.exports = {
   output: {
     //webpack 默认把打包后的 js 文件输出为 main.js, 这行属性给文件名加 hash, 实现所谓的 cache busting
     filename: '[name]-[contentHash].js' 
+    //code spliting 是的文件名
+    chunkFilename: '[name]-[contentHash].js'
   },
   module: {
     rules: [
@@ -153,7 +156,8 @@ module.exports = {
     new MiniCssExtractPlugin({
       //给打包后的 css 文件添加 hash
       filename: '[name]-[contentHash].css', 
-      chunkFilename: '[id].css',
+      //code spliting 的文件名
+      chunkFilename: '[name]-[contentHash].css',
       ignoreOrder: false,
     }),
     new CleanWebpackPlugin(),
@@ -170,7 +174,7 @@ presets 定义了 babel 转换 js 代码的规则, 其中 @babel/preset-react �
 ```
 {
   "presets": ["@babel/preset-react", "@babel/preset-env"],
-  "plugins": ["@babel/plugin-proposal-class-properties"]
+  "plugins": ["@babel/plugin-proposal-class-properties", "@babel/plugin-syntax-dynamic-import"]
 }
 ```
 
