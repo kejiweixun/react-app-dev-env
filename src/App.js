@@ -1,28 +1,31 @@
-import React, { Component } from 'react';
+//@flow
+import React, { Component, Suspense } from 'react';
+const HelloWorld = React.lazy(() => import('./HelloWorld'));
 
 class App extends Component {
   state = {
     hello: 'hello world!',
-    Element: '',
   }
 
-  componentDidMount = () => {
-    import(/* webpackChunkName: "HelloWorld" */ './HelloWorld')
-      .then(res => res.default)
-      .then(HelloWorld => {
-        this.setState({
-          Element: HelloWorld
-        });
-      })
-  }
+  // componentDidMount = () => {
+  //   import(/* webpackChunkName: "HelloWorld" */ './HelloWorld')
+  //     .then(res => res.default)
+  //     .then(HelloWorld => {
+  //       this.setState({
+  //         Element: HelloWorld
+  //       });
+  //     })
+  // }
 
   render() {
-    let Element = this.state.Element;
-    console.log(Element);
+
+    console.log(HelloWorld);
     return (
       <div>
-       {Element && <Element hello={this.state.hello}/>}
-      </div>
+      <Suspense fallback={<div>Loading...</div>}>
+        <HelloWorld hello={this.state.hello}/>
+      </Suspense>
+    </div>
     )
   }
 };
